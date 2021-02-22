@@ -31,5 +31,5 @@
     "submitter": "NVIDIA",
     "sw_notes": "",
     "system_name": "Supermicro 4029GP-TRT-OTO-28 (1x T4, TensorRT)",
-    "system_type": "edge"
+    "system_type": "datacenter"
 }
