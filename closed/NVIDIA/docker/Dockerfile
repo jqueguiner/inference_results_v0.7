@@ -27,6 +27,9 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
+COPY passwd /etc/passwd
+COPY group /etc/group
+
 # Explicitly use bash instead of sh ('echo' behaves differently on some shells)
 SHELL ["/bin/bash", "-c"]
 
@@ -105,10 +108,10 @@ RUN wget https://github.com/NVlabs/cub/archive/1.8.0.zip -O cub-1.8.0.zip \
  && rm -rf cub-1.8.0.zip cub-1.8.0
 
 # Install libjemalloc2
-RUN echo 'deb http://archive.ubuntu.com/ubuntu eoan main restricted universe multiverse' | tee -a /etc/apt/sources.list.d/eoan.list \
-  && echo 'Package: *\nPin: release a=eoan\nPin-Priority: -10\n' | tee -a /etc/apt/preferences.d/eoan.pref \
+RUN echo 'deb http://archive.ubuntu.com/ubuntu focal main restricted universe multiverse' | tee -a /etc/apt/sources.list.d/focal.list \
+  && echo 'Package: *\nPin: release a=focal\nPin-Priority: -10\n' | tee -a /etc/apt/preferences.d/focal.pref \
   && apt-get update \
-  && apt-get install --no-install-recommends -t eoan -y libjemalloc2 libtcmalloc-minimal4
+  && apt-get install --no-install-recommends -t focal -y libjemalloc2 libtcmalloc-minimal4
 
 # Install HuggingFace Transformers
 RUN python3 -m pip install transformers==2.4.0
@@ -166,4 +169,80 @@ RUN python3 -m pip install nvidia-pyindex \
 # Explicitly downgrade numpy since cocoeval requires numpy 1.16.x.
 RUN python3 -m pip install numpy==1.16.0
 
+RUN apt-get update && apt-get install -y \
+    man \
+    vim \
+    nano \
+    htop \
+    curl \
+    wget \
+    rsync \
+    ca-certificates \
+    git \
+    zip \
+    procps \
+    ssh \
+    supervisor \
+    gettext-base \
+    && rm -rf /var/lib/apt/lists/*
+
+# install nvm
+# https://github.com/creationix/nvm#install-script
+RUN curl --silent -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+
+ENV NVM_DIR /root/.nvm
+ENV NODE_VERSION v12.20.1
+
+# install node and npm
+RUN source $NVM_DIR/nvm.sh \
+    && nvm install $NODE_VERSION \
+    && nvm alias default $NODE_VERSION \
+    && nvm use default
+
+# add node and npm to path so the commands are available
+ENV NODE_PATH $NVM_DIR/versions/node/$NODE_VERSION/bin
+ENV PATH $NODE_PATH:$PATH
+
+# Install VSCode Server
+RUN wget --quiet https://github.com/cdr/code-server/releases/download/v3.5.0/code-server_3.5.0_amd64.deb && \
+    dpkg -i code-server_3.5.0_amd64.deb && rm -rf code-server_3.5.0_amd64.deb && \
+    rm -f code-server_3.5.0_amd64.deb && \
+    /usr/bin/code-server --install-extension ms-python.python --force
+
+COPY vscode.sh /usr/bin/vscode.sh
+EXPOSE 8081
+
+# Install Jupyter
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+RUN get-pip.py --force-reinstall
+RUN pip install pip==20.3.4
+RUN pip install jupyterlab==2.2.9 ipywidgets==7.6.3
+RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
+RUN jupyter nbextension enable --py widgetsnbextension #enable ipywidgets
+COPY jupyter.sh /usr/bin/jupyter.sh
+EXPOSE 8082
+
+# Home server
+COPY home-server.sh /usr/bin/home-server.sh
+RUN mkdir -p /usr/opt/
+RUN chown 42420:42420 /usr/opt/
+COPY home-server.html /usr/bin/home-server.html
+EXPOSE 8080
+
+# MOTD
+COPY motd.sh /usr/bin/motd.sh
+
+
 WORKDIR /work
+RUN git clone https://github.com/jqueguiner/inference_results_v0.7.git
+
+RUN chown -R 42420:42420 /workspace
+RUN chown -R 42420:42420 /work
+
+
+
+COPY supervisor.conf /etc/supervisor/supervisor.conf
+
+ENTRYPOINT []
+CMD ["supervisord", "-n", "-u", "42420", "-c", "/etc/supervisor/supervisor.conf"]
+
