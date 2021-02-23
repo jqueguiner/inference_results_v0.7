@@ -69,7 +69,7 @@ The systems that NVIDIA supports and has tested are:
 
 :warning: **IMPORTANT**: Please use [closed/NVIDIA](closed/NVIDIA) (this directory) as the working directory when running any of the commands below. :warning:
 
-**Note:** Inside the Docker container, [closed/NVIDIA](closed/NVIDIA) will be mounted at `/work`.
+**Note:** Inside the Docker container, [closed/NVIDIA](closed/NVIDIA) will be mounted at `/workspace`.
 
 If you are working on the MLPerf Inference open submission, use [open/NVIDIA](open/NVIDIA) instead.
 
