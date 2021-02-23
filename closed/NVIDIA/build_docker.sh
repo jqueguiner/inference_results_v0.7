@@ -1,1 +1,1 @@
-docker build -t mlperf-bert-v07 -f docker/Dockerfile .
+cd docker && docker build -t mlperf-bert-v07 -f docker/Dockerfile .

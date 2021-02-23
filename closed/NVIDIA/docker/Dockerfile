@@ -2,10 +2,6 @@ FROM nvidia/cuda:11.0-cudnn8-devel-ubuntu18.04
 # Explicitly use bash instead of sh ('echo' behaves differently on some shells)
 SHELL ["/bin/bash", "-c"]
 
-# Build binaries so that the image can be used out-of-the-box
-RUN ln -s /usr/lib/x86_64-linux-gnu/libcuda.so.1 /usr/lib/x86_64-linux-gnu/libcuda.so \
- && make build
-
 COPY passwd /etc/passwd
 COPY group /etc/group
 
@@ -190,7 +186,7 @@ EXPOSE 8081
 
 # Install Jupyter
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-RUN get-pip.py --force-reinstall
+RUN python3 get-pip.py --force-reinstall
 RUN pip install pip==20.3.4
 RUN pip install jupyterlab==2.2.9 ipywidgets==7.6.3
 RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
