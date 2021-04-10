@@ -18,4 +18,6 @@ make generate_engines RUN_ARGS="--benchmarks=$THIS_BENCHMARKS --scenarios=$SCENA
 #--test_mode=[PerformanceOnly,AccuracyOnly]
 # LOG_DIR=/var/log/benchmark
 # --log_copy_detail_to_stdout
+mkdir -p /work/log/mlperf/
+touch /work/log/mlper/perf_harness_summary.json
 make run_harness RUN_ARGS="--benchmarks=$THIS_BENCHMARKS --scenarios=$SCENARIOS --config_ver=$CONFIG_VER --test_mode=$TEST_MODE"
