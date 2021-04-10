@@ -148,6 +148,8 @@ RUN apt-get update && apt-get install -y \
     htop \
     curl \
     wget \
+    screen \    
+    tmux \    
     rsync \
     ca-certificates \
     git \
@@ -207,8 +209,6 @@ COPY motd.sh /usr/bin/motd.sh
 WORKDIR /workspace
 RUN git clone https://github.com/jqueguiner/inference_results_v0.7.git
 
-RUN chown -R 42420:42420 /workspace
-
 COPY supervisor.conf /etc/supervisor/supervisor.conf
 
 ENV MLPERF_SCRATCH_PATH /workspace/mlperfv07_data
@@ -218,5 +218,5 @@ WORKDIR /workspace/inference_results_v0/closed/NVIDIA/
 RUN make build
 
 ENTRYPOINT []
-CMD ["supervisord", "-n", "-u", "42420", "-c", "/etc/supervisor/supervisor.conf"]
+CMD ["supervisord", "-n", "-c", "/etc/supervisor/supervisor.conf"]
 

@@ -218,7 +218,8 @@ endif
 
 ############################## DOWNLOAD_MODEL ##############################
 
-BENCHMARKS = resnet50 ssd-resnet34 ssd-mobilenet bert dlrm rnnt 3d-unet
+DEFAULT_BENCHMARKS = resnet50 ssd-resnet34 ssd-mobilenet bert dlrm rnnt 3d-unet
+BENCHMARKS := $(or ${BENCHMARKS},${BENCHMARKS},DEFAULT_BENCHMARKS)
 
 .PHONY: download_model
 download_model: link_dirs
