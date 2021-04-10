@@ -213,9 +213,9 @@ COPY supervisor.conf /etc/supervisor/supervisor.conf
 
 ENV MLPERF_SCRATCH_PATH /workspace/mlperfv07_data
 
-WORKDIR /workspace/inference_results_v0/closed/NVIDIA/
+WORKDIR /workspace/inference_results_v0.7/closed/NVIDIA/
 
-RUN make build
+ENV WORK_ROOT_DIR /workspace
 
 ENTRYPOINT []
 CMD ["supervisord", "-n", "-c", "/etc/supervisor/supervisor.conf"]
