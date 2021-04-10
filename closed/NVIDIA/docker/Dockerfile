@@ -2,9 +2,6 @@ FROM nvidia/cuda:11.0-cudnn8-devel-ubuntu18.04
 # Explicitly use bash instead of sh ('echo' behaves differently on some shells)
 SHELL ["/bin/bash", "-c"]
 
-COPY passwd /etc/passwd
-COPY group /etc/group
-
 RUN apt-get update \
  && apt-get install -y --no-install-recommends build-essential autoconf libtool git \
         ccache curl wget pkg-config sudo ca-certificates vim-tiny automake libssl-dev \
