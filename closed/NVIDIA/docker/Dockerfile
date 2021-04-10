@@ -136,84 +136,25 @@ RUN python3 -m pip install nvidia-pyindex \
     && python3 -m pip install uff graphsurgeon onnx-graphsurgeon
 
 # Explicitly downgrade numpy since cocoeval requires numpy 1.16.x.
-RUN python3 -m pip install numpy==1.16.0
+RUN python3 -m pip install numpy==1.16.0 cmake
 
-RUN apt-get update && apt-get install -y \
-    man \
-    vim \
-    nano \
-    htop \
-    curl \
-    wget \
-    screen \    
-    tmux \    
-    rsync \
-    ca-certificates \
-    git \
-    zip \
-    procps \
-    ssh \
-    supervisor \
-    gettext-base \
-    && rm -rf /var/lib/apt/lists/*
 
-# install nvm
-# https://github.com/creationix/nvm#install-script
-RUN curl --silent -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
-
-ENV NVM_DIR /root/.nvm
-ENV NODE_VERSION v12.20.1
-
-# install node and npm
-RUN source $NVM_DIR/nvm.sh \
-    && nvm install $NODE_VERSION \
-    && nvm alias default $NODE_VERSION \
-    && nvm use default
-
-# add node and npm to path so the commands are available
-ENV NODE_PATH $NVM_DIR/versions/node/$NODE_VERSION/bin
-ENV PATH $NODE_PATH:$PATH
-
-# Install VSCode Server
-RUN wget --quiet https://github.com/cdr/code-server/releases/download/v3.5.0/code-server_3.5.0_amd64.deb && \
-    dpkg -i code-server_3.5.0_amd64.deb && rm -rf code-server_3.5.0_amd64.deb && \
-    rm -f code-server_3.5.0_amd64.deb && \
-    /usr/bin/code-server --install-extension ms-python.python --force
-
-COPY vscode.sh /usr/bin/vscode.sh
-EXPOSE 8081
-
-# Install Jupyter
-RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-RUN python3 get-pip.py --force-reinstall
-RUN pip install pip==20.3.4
-RUN pip install jupyterlab==2.2.9 ipywidgets==7.6.3
-RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
-RUN jupyter nbextension enable --py widgetsnbextension #enable ipywidgets
-COPY jupyter.sh /usr/bin/jupyter.sh
-EXPOSE 8082
-
-# Home server
-COPY home-server.sh /usr/bin/home-server.sh
-RUN mkdir -p /usr/opt/
-RUN chown 42420:42420 /usr/opt/
-COPY home-server.html /usr/bin/home-server.html
-EXPOSE 8080
-
-# MOTD
-COPY motd.sh /usr/bin/motd.sh
-
-WORKDIR /workspace
+WORKDIR /work
 RUN git clone https://github.com/jqueguiner/inference_results_v0.7.git
-
-COPY supervisor.conf /etc/supervisor/supervisor.conf
 
 ENV MLPERF_SCRATCH_PATH /workspace/mlperfv07_data
 
-WORKDIR /workspace/inference_results_v0.7/closed/NVIDIA/
+WORKDIR /work/inference_results_v0.7/closed/NVIDIA/
 
-ENV WORK_ROOT_DIR /workspace
+
+ENV WORK_ROOT_DIR=/work \
+    LOG_DIR=/work/log/mlperf \
+    BENCHMARKS="bert" \
+    TEST_MODE="PerformanceOnly" \
+    SCENARIOS="Offline"
+
+RUN mkdir -p $LOG_DIR
 
 ENTRYPOINT []
-CMD ["supervisord", "-n", "-c", "/etc/supervisor/supervisor.conf"]
+CMD ["/bin/bash", "run_bench.sh"]
 

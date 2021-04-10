@@ -5,7 +5,6 @@ make download_model # Downloads models and saves to $MLPERF_SCRATCH_PATH/models
 make download_data # Downloads datasets and saves to $MLPERF_SCRATCH_PATH/data
 make preprocess_data # Preprocess data and saves to $MLPERF_SCRATCH_PATH/preprocessed_data
 
-cd $WORK_ROOT_DIR/inference_results_v0.7/closed/NVIDIA
 #BENCHMARK=bert or resnet50 ssd-resnet34 ssd-mobilenet bert dlrm rnnt 3d-unet
 #SCENARIO=Offline or Server SingleStream MultiStream
 #CONFIG_VER =default,high_accuracy,triton, high_accuracy_triton,all
@@ -15,8 +14,8 @@ cd $WORK_ROOT_DIR/inference_results_v0.7/closed/NVIDIA
 make info >> $LOG_DIR/build_info.txt
 THIS_BENCHMARKS=$(echo $BENCHMARKS | tr -s '[:blank:]' ',')
 
-make generate_engines RUN_ARGS="--benchmarks=$THIS_BENCHMARKS --scenarios=$SCENARIO --config_ver=$CONFIG_VER"
+make generate_engines RUN_ARGS="--benchmarks=$THIS_BENCHMARKS --scenarios=$SCENARIOS --config_ver=$CONFIG_VER"
 #--test_mode=[PerformanceOnly,AccuracyOnly]
 # LOG_DIR=/var/log/benchmark
 # --log_copy_detail_to_stdout
-make run_harness RUN_ARGS="--benchmarks=$THIS_BENCHMARKS --scenarios=$SCENARIO --config_ver=$CONFIG_VER --test_mode=$TEST_MODE --log_dir=$LOG_DIR --log_copy_detail_to_stdout"
+make run_harness RUN_ARGS="--benchmarks=$THIS_BENCHMARKS --scenarios=$SCENARIOS --config_ver=$CONFIG_VER --test_mode=$TEST_MODE --log_dir=$LOG_DIR --log_copy_detail_to_stdout"

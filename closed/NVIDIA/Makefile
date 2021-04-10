@@ -84,6 +84,7 @@ endif
 
 # Please run `export MLPERF_SCRATCH_PATH=<path>` to set your scratch space path.
 # The below paths are for internal use only.
+MLPERF_SCRATCH_PATH := $(or ${MLPERF_SCRATCH_PATH},${MLPERF_SCRATCH_PATH},/work)
 ifneq ($(wildcard /home/scratch.mlperf_inference),)
 	MLPERF_SCRATCH_PATH ?= /home/scratch.mlperf_inference
 endif
@@ -175,9 +176,9 @@ ifeq ($(ARCH), x86_64)
 ifeq ($(NO_DOCKER_PULL), 0)
 	docker pull $(BASE_IMAGE)
 endif
-	DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build -t mlperf-inference:$(DOCKER_TAG)-latest \
+	docker build -t mlperf-inference:$(DOCKER_TAG)-latest \
 		--build-arg BASE_IMAGE=$(BASE_IMAGE) \
-		--network host - < docker/Dockerfile
+		--network host -f docker/Dockerfile .
 ifeq ($(NO_BUILD), 0)
 	DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build -t mlperf-inference:$(DOCKER_TAG)-latest --no-cache --network host \
 		--build-arg BASE_IMAGE=mlperf-inference:$(DOCKER_TAG)-latest \
@@ -219,7 +220,7 @@ endif
 ############################## DOWNLOAD_MODEL ##############################
 
 DEFAULT_BENCHMARKS = resnet50 ssd-resnet34 ssd-mobilenet bert dlrm rnnt 3d-unet
-BENCHMARKS := $(or ${BENCHMARKS},${BENCHMARKS},DEFAULT_BENCHMARKS)
+BENCHMARKS := $(or ${BENCHMARKS},${BENCHMARKS},$(DEFAULT_BENCHMARKS))
 
 .PHONY: download_model
 download_model: link_dirs
