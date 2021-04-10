@@ -14,10 +14,10 @@ make preprocess_data # Preprocess data and saves to $MLPERF_SCRATCH_PATH/preproc
 make info >> $LOG_DIR/build_info.txt
 THIS_BENCHMARKS=$(echo $BENCHMARKS | tr -s '[:blank:]' ',')
 
-make generate_engines RUN_ARGS="--benchmarks=$THIS_BENCHMARKS --scenarios=$SCENARIOS --config_ver=$CONFIG_VER"
+make generate_engines RUN_ARGS="--benchmarks=$THIS_BENCHMARKS --scenarios=$SCENARIOS"
 #--test_mode=[PerformanceOnly,AccuracyOnly]
 # LOG_DIR=/var/log/benchmark
 # --log_copy_detail_to_stdout
 mkdir -p /work/log/mlperf/
 touch /work/log/mlperf/perf_harness_summary.json
-make run_harness RUN_ARGS="--benchmarks=$THIS_BENCHMARKS --scenarios=$SCENARIOS --config_ver=$CONFIG_VER --test_mode=$TEST_MODE"
+make run_harness RUN_ARGS="--benchmarks=$THIS_BENCHMARKS --scenarios=$SCENARIOS --test_mode=$TEST_MODE"
