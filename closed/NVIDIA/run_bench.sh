@@ -1,6 +1,5 @@
 #MLPERF_SCRATCH_PATH=/work
 mkdir -p $LOG_DIR
-if 
 #make build
 make download_model # Downloads models and saves to $MLPERF_SCRATCH_PATH/models
 make download_data # Downloads datasets and saves to $MLPERF_SCRATCH_PATH/data
